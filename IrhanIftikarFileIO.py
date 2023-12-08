@@ -1,8 +1,8 @@
 #Name: Irhan Iftikar
 #Date: November 2023
 #Description: .csv file-reading program that reads from a database of GCDS students and allows user to make menu choices
-#Criteria: Meets spec criteria #1-12 (inclusive), and #14
-#Challenges: Creates graphs from data, deletes records from .csv, updates and changes records to .csv, creates a menu, uses functions, program repeats
+#Criteria: Meets spec criteria #1-14 (inclusive)
+#Challenges: Creates graphs from data, creates a webpage output of graphs, deletes records from .csv, updates and changes records to .csv, creates a menu, uses functions, program repeats
 #Bugs: No notable bugs found in program
 #Sources: Various Internet Syntax Sources (w3schools, Stack Overflow, GeeksForGeeks, etc.)
 
@@ -10,7 +10,12 @@
 import sys
 from csv import writer
 import matplotlib.pyplot as plt
-import pandas as pd    
+import pandas as pd   
+from pathlib import Path
+
+#Reads in .csv from directory in which it is stored in
+current_dir = Path(__file__).parent
+file_path = current_dir / "gcds_data.csv" 
 
 def main_screen():
     #Description: Function that outputs the main screen menu options to the user
@@ -37,7 +42,7 @@ def add():
     new_entry = []
     first_name, middle_name, last_name, grade, gender, teacher, city, state, zip_code = input("Enter first name, middle, last, grade, gender, teacher, city, \nstate, and zip code (separated by commas, capitalized, no spacing): ").split(",", 9)
     new_entry.extend((first_name, middle_name, last_name, grade, gender, teacher, city, state, zip_code))
-    with open("C:\\Users\\iiftikar26\\Desktop\\GCDS Comp Sci\\gcds_data.csv", "a", newline='') as fp:
+    with open(file_path, "a", newline='') as fp:
         writer_object = writer(fp)
         writer_object.writerow(new_entry)   #Writes new user entry data to existing .csv
         print("Data record added!")
@@ -50,7 +55,7 @@ def update(file_in):
     df = pd.read_csv(file_in)       #Using Pandas to save the inputted .csv file to a dataframe called df
     user_search = input("Enter the FULL name of the student to update (case sensitive): ")
     index_count = -2      #Starts index count at -2 to account for pandas formatting
-    for line in open("C:\\Users\\iiftikar26\\Desktop\\GCDS Comp Sci\\gcds_data.csv"):
+    for line in open(file_path):
         list_of_words = line.split(",")
         index_count += 1
         if (list_of_words[0] + " " + list_of_words[2]) == user_search:
@@ -60,7 +65,7 @@ def update(file_in):
             
             #Code below uses Pandas to replace the appropriate index row with the updated information given by the user to the .csv file
             df.loc[index_count] = [first_name, middle_name, last_name, grade, gender, teacher, city, state, zip_code]
-            df.to_csv("C:\\Users\\iiftikar26\\Desktop\\GCDS Comp Sci\\gcds_data.csv", index=False)
+            df.to_csv(file_path, index=False)
             print("Data record successfully updated and saved to .csv")
             break
     if output == False:     #If requested data record isn't found
@@ -74,7 +79,7 @@ def delete(file_in):
     df = pd.read_csv(file_in)      #Using Pandas to save the inputted .csv file to a dataframe called df
     user_search = input("Enter the FULL name of the student to delete (case sensitive): ")
     index_count = -2        #Starts index count at -2 to account for pandas formatting
-    for line in open("C:\\Users\\iiftikar26\\Desktop\\GCDS Comp Sci\\gcds_data.csv"):
+    for line in open(file_path):
         list_of_words = line.split(",")
         index_count += 1
         if (list_of_words[0] + " " + list_of_words[2]) == user_search:
@@ -82,7 +87,7 @@ def delete(file_in):
 
             #Code below uses Pandas to delete the index row of the record the user wants to delete in the .csv file
             df = df.drop(index_count)
-            df.to_csv("C:\\Users\\iiftikar26\\Desktop\\GCDS Comp Sci\\gcds_data.csv", index=False)
+            df.to_csv(file_path, index=False)
             print("Data record successfully deleted and saved to .csv")
             break
     if output == False:
@@ -144,6 +149,7 @@ def sort_grade(file_in):
     plt.title('Graphed Data of Grade Proportion in the GCDS High School in 2019')
     plt.xlabel('Grade')
     plt.ylabel('Number of Students')
+    plt.savefig('graph_grade.png')
     plt.show()
 
 def sort_gender(file_in):
@@ -168,6 +174,7 @@ def sort_gender(file_in):
     plt.title('Graphed Data of Gender Proportion in GCDS in 2019')
     plt.xlabel('Gender')
     plt.ylabel('Number of Students')
+    plt.savefig('graph_gender.png')
     plt.show()
 
 def sort_state(file_in):
@@ -192,6 +199,7 @@ def sort_state(file_in):
     plt.title('Graphed Data of State Location Proportion in GCDS in 2019')
     plt.xlabel('State')
     plt.ylabel('Number of Students')
+    plt.savefig('graph_state.png')
     plt.show()
     
 def gradesix_males_greenwich(file_in):
@@ -212,9 +220,10 @@ def gradesix_males_greenwich(file_in):
     x_axis = ["6th Grade Males living in Greenwich", "Total 6th Graders"]
     y_axis = [gradesix_males_greenwich, gradesix]
     plt.bar(x_axis, y_axis)
-    plt.title('Graphed Data of Proportion of 6th Grade Males in Greenwich to Total 6th Graders in GCDS in 2019')
+    plt.title('6th Grade Greenwich Males to Total 6th Graders in GCDS in 2019')
     plt.xlabel('Criteria')
     plt.ylabel('Number of Students')
+    plt.savefig('graph_gradesix_males_greenwich.png')
     plt.show()
 
 def quit():
@@ -227,7 +236,7 @@ def main():
     #Description: Main function that prompts user for input and executes the other functions
     #parameters - void
     #returns - void
-    file_in = open("C:\\Users\\iiftikar26\\Desktop\\GCDS Comp Sci\\gcds_data.csv")
+    file_in = open(file_path)
     choice = input("Select an option from the menu (numbers 1-10): ")
     if choice == "1":
         add()
